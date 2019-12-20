@@ -132,7 +132,7 @@ var copyLineDown = function(yashe) {
     var formattedQuery = "";
     var currentLine = "";
     var stackTrace = [];
-    CodeMirror.runMode(text, "shex", function(stringVal, type) {
+    CodeMirror.runMode(text, "shexML", function(stringVal, type) {
       stackTrace.push(type);
       var breakType = getBreakType(stringVal, type);
       if (breakType != 0) {

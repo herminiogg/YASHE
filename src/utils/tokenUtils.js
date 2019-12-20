@@ -37,8 +37,16 @@ var getNextNonWsToken = function(yashe, lineNumber, charNumber) {
   return token;
 };
 
+var getDefinedVariables = function(yashe) {
+  return yashe.getTokenAt(
+    { line: yashe.lastLine(), ch: yashe.getLine(yashe.lastLine()).length },
+    true
+  ).state.variables;
+}
+
 module.exports = {
   getPreviousNonWsToken: getPreviousNonWsToken,
   getCompleteToken: getCompleteToken,
-  getNextNonWsToken: getNextNonWsToken
+  getNextNonWsToken: getNextNonWsToken,
+  getDefinedVariables: getDefinedVariables
 };

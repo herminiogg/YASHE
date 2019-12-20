@@ -198,8 +198,8 @@ module.exports = function(YASHE, yashe) {
 
       if(completer.name == 'wikidata'){
         //Do not replace the prefix 
-        var prefix = token.string.split(':')[0]
-        startChar = token.start + prefix.length + 1
+        //var prefix = token.string.split(':')[0]
+        startChar = token.start// + prefix.length + 1
       }else{
         startChar = token.start
       }

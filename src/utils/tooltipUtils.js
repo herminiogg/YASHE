@@ -48,12 +48,14 @@ var triggerTooltip = function( yashe, e) {
   var token = yashe.getTokenAt( yashe.coordsChar( {
     left: posX,
     top: posY
-  } ) ).string;
+  } ) );
 
 
+var cur = yashe.getCursor();
     
-var prefixName = token.split(':')[0]
-var wikiElement = token.split(':')[1]
+var colonToken = yashe.getPreviousNonWsToken(cur.line, token);
+var prefixName = yashe.getPreviousNonWsToken(cur.line, colonToken).string;
+var wikiElement = token.string;
 
 //Check wikidata prefixes
 if( rdfUtils.isWikidataValidPrefix(yashe,prefixName) && wikiElement!== undefined  && wikiElement!== ''){

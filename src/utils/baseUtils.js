@@ -62,7 +62,7 @@ var readFile = function handleFileSelect(yashe,evt) {
 
   var file = event.target.files[0];
   //Only ShEx files allowed
-  if(!file.name.endsWith('.shex')){
+  if(!file.name.endsWith('.shexml')){
     return;
   }
   

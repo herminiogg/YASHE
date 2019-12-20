@@ -18,12 +18,22 @@ module.exports = function(yashe, name) {
       return module.exports.isValidCompletionPosition(yashe);
     },
     get: function(token, callback) {
+
+        var cur = yashe.getCursor();
      
-        var possibleEntity = token.string.split(':')[1]
-        var prefix = token.string.split(':')[0]
+        if(token.string == ':') {
+          var possibleEntity = "";
+          var prefix = yashe.getPreviousNonWsToken(cur.line, token).string;
+        } else {
+          var previousToken = yashe.getPreviousNonWsToken(cur.line, token);
+          var prefix = yashe.getPreviousNonWsToken(cur.line, previousToken).string;
+          var possibleEntity = token.string;
+        }
+        
 
         var query = QUERY
         query.search=possibleEntity
+        //query.search=token
 
         //Add extra param if it is a property
         if(rdfUtils.isWikidataPropertiesPrefix(yashe,prefix)){
@@ -87,19 +97,22 @@ module.exports.isValidCompletionPosition = function(yashe) {
 
   
   var token = yashe.getCompleteToken();
-  var cur = yashe.getCursor()
+  var cur = yashe.getCursor();
 
   //The cursor should stay at the end of the token
   if(token.end!=cur.ch)return false
 
-  var prefixName = token.string.split(':')[0]
   var previousToken = yashe.getPreviousNonWsToken(cur.line, token);
+  if(previousToken.string == ':')
+    var prefixName = yashe.getPreviousNonWsToken(cur.line, previousToken).string;
+  else
+    var prefixName = previousToken.string;
 
   //This line avoid the autocomplete in the prefix definition
   if(previousToken.string.toUpperCase() == 'PREFIX')return false
 
 
-  if(token.type == 'string-2' && 
+  if((token.string == ':' || previousToken.string == ':') && 
   (rdfUtils.isWikidataEntitiesPrefix(yashe,prefixName) 
   || rdfUtils.isWikidataPropertiesPrefix(yashe,prefixName)) )return true
 

@@ -1,9 +1,9 @@
 
-top_symbol(shexDoC).
+top_symbol(shexML).
 output_file('_tokenizer-table.js').
 
 js_vars([
-  startSymbol='"shexDoC"',
+  startSymbol='"shexML"',
   acceptEmpty=true
 ]).
 

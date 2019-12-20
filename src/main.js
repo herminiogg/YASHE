@@ -158,6 +158,10 @@ const extendCmInstance = function(yashe) {
     return prefixUtils.getDefinedPrefixes(yashe);
   };
 
+  yashe.getDefinedVariables = function() {
+    return tokenUtils.getDefinedVariables(yashe);
+  };
+
   /**
    * Add prefixes to the ShEx documment
    * @param {string|list} prefixes String if you want to add just one
@@ -365,6 +369,10 @@ root.registerAutocompleter('prefixDefinition',
 
 root.registerAutocompleter('prefixesAndKeywords',
     require('./autocompleters/prefixesAndKeywords.js'));
+
+root.registerAutocompleter('variables',
+    require('./autocompleters/variables.js'));
+
 
 
 /**

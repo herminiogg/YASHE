@@ -35,8 +35,8 @@ var drawButtons = function(yashe){
           .attr("title", "Download File")
           .attr("id", "downloadBtn")
           .click(function() {          
-            var textFileAsBlob = new Blob([ yashe.getValue() ], { type: 'text/shex' });
-            var fileNameToSaveAs = "document.shex";
+            var textFileAsBlob = new Blob([ yashe.getValue() ], { type: 'text/shexML' });
+            var fileNameToSaveAs = "document.shexml";
   
             var downloadLink = document.createElement("a");
             downloadLink.download = fileNameToSaveAs;

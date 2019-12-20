@@ -18,300 +18,107 @@ stephen.cresswell@tso.co.uk
 
 :-dynamic '==>'/2.
 
+shexML ==> [*(decl), *(shape), $].
 
-%[1] OK
-shexDoC  ==> [*(directive),?([or(notStartAction,startActions),*(statement)]), $ ].
+decl ==> [or(source, prefix, expression, matcher, iterator, autoincrement)].
 
-%[2] OK
-directive ==> [or(baseDecl,prefixDecl)].
+prefix ==> ['PREFIX', ?([allowedIdentifiers]), ':', '<', 'URL', '>'].
 
-%[3] OK
-baseDecl ==> ['BASE','IRI_REF'].
+source ==> ['SOURCE', allowedIdentifiers, '<', 'URL', '>'].
 
-%[4] OK
-prefixDecl ==> ['PREFIX','PNAME_NS','IRI_REF'].
+iterator ==> ['ITERATOR', allowedIdentifiers, '<', queryClause, '>', '{', +(field), *(nestedIterator), '}'].
 
-%[5] OK
-notStartAction ==> [or(startt,shapeExprDecl)].
+nestedIterator ==> ['ITERATOR', allowedIdentifiers, '<', allowedStrings, '>', '{', +(field), *(nestedIterator), '}'].
 
-%[6] OK
-startt ==> ['START','=',shapeExpression].
+field ==> ['FIELD', allowedIdentifiers, '<', allowedStrings, '>'].
 
-%[7] OK
-startActions ==> [+(codeDecl)].
+autoincrement ==> ['AUTOINCREMENT', allowedIdentifiers, '<', ?(['STRINGOPERATOR', '+']), 'DIGITS', ?(['TO', 'DIGITS']), ?(['BY', 'DIGITS']), ?(['+', 'STRINGOPERATOR']), '>'].
 
-%[8] OK
-statement ==> [or(directive,notStartAction)].
+expression ==> ['EXPRESSION', allowedIdentifiers, '<', exp, '>'] .
 
-%[9] OK
-shapeExprDecl ==> [shapeExprLabel,or(shapeExpression,'EXTERNAL')].
+matcher ==> ['MATCHER', allowedIdentifiers, '<', matchers, '>'] .
 
-%[10] OK
-shapeExpression ==> [shapeOr].
+matchers ==> [replacedStrings, 'AS', or(allowedIdentifiers, 'STRINGOPERATOR', 'DIGITS'), ?([and, matchers])]  .
 
-%[11] OK
-inlineShapeExpression ==> [inlineShapeOr].
+replacedStrings ==> [or(allowedIdentifiers, 'STRINGOPERATOR', 'DIGITS'), ?([',', replacedStrings])] .
 
-%[12] OK
-shapeOr ==> [shapeAnd,*(['OR',shapeAnd])].
+allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'AS', '$')])] .
 
-%[13] OK
-inlineShapeOr ==> [inlineShapeAnd,*(['OR',inlineShapeAnd])].
+allowedIdentifiers ==> [?('AS'), ?('a'), 'STRING_OR_VAR'] .
 
-%[14] OK
-shapeAnd ==> [shapeNot,*(['AND',shapeNot])].
+exp ==> [expOperation] .
 
-%[15] OK
-inlineShapeAnd ==> [inlineShapeNot,*(['AND',inlineShapeNot])].
+expOperation ==> [allowedIdentifiers, composedVariable, or(unions, expOperations)] .
+expOperation ==> [] .
 
-%[16] OK
-shapeNot ==> [?('NOT'),shapeAtom].
+expOperations ==> ['+', 'STRINGOPERATOR', '+', allowedIdentifiers, composedVariable, unions] .
 
-%[17] OK
-inlineShapeNot ==> [?('NOT'),inlineShapeAtom].
+composedVariable ==> [+(['.', allowedIdentifiers])] .
 
-%[18] OK
-shapeAtom ==> [nodeConstraint,?(shapeOrRef)].
-shapeAtom ==> [shapeOrRef].
-shapeAtom ==> ['(',shapeExpression,')'].
-shapeAtom ==> ['.'].
+queryClause ==> ['JSONPATH', allowedStrings] .
+queryClause ==> ['XMLPATH', allowedStrings] .
+queryClause ==> ['CSVPERROW'] .
 
+union ==> [allowedIdentifiers, composedVariable, or(unions, expOperations)] .
+unions ==> ['UNION', union] .
+unions ==> ['JOIN', union] .
+unions ==> [] .
 
-%[19] OK
-inlineShapeAtom ==> [nodeConstraint,?(inlineShapeOrRef)].
-inlineShapeAtom ==> [inlineShapeOrRef,?(nodeConstraint)].
-inlineShapeAtom ==> ['(',shapeExpression,')'].
-inlineShapeAtom ==> ['.'].
+shape ==> [tripleElement, ?([allowedIdentifiers]), ':', '[', allowedIdentifiers, ?([composedVariable]), ']', '{', +([predicateObject, ';']), '}'] .
 
-%[20] OK
-shapeOrRef ==> [shapeDefinition].
-shapeOrRef ==> ['ATPNAME_NS'].
-shapeOrRef ==> ['ATPNAME_LN'].
-shapeOrRef ==> ['@',shapeExprLabel].
+predicateObject ==> [predicate, or(objectElement, shapeLink, literalValueObjectElementStart), datatype, langtag] .
 
-%[21] OK
-inlineShapeOrRef ==> [inlineShapeDefinition].
-inlineShapeOrRef ==> ['ATPNAME_NS'].
-inlineShapeOrRef ==> ['ATPNAME_LN'].
-inlineShapeOrRef ==> ['@',shapeExprLabel].
+literalValueObjectElementStart ==> [?('STRING_OR_VAR'), ':', or(literalValue, objectElement)] .
 
+objectElement ==> [or(['[', allowedIdentifiers, ?([composedVariable]), matching, ']'], 'STRINGOPERATOR')] .
 
-%[22] OK
-nodeConstraint ==> ['LITERAL',*(stringFacet)].
-nodeConstraint ==> [nonLiteralKind,*(xsFacet)].
-nodeConstraint ==> [datatype,*(xsFacet)].
-nodeConstraint ==> [valueSet,*(xsFacet)].
-nodeConstraint ==> [+(xsFacet)].
+shapeLink ==> [or(['@', ?(allowedIdentifiers), ':', allowedIdentifiers], ['<', ?(allowedIdentifiers), ':', allowedIdentifiers, '>'])] .
 
-%[23] OK
-nonLiteralKind ==> ['IRI'].
-nonLiteralKind ==> ['BNODE'].
-nonLiteralKind ==> ['NONLITERAL'].
+predicate ==> [or('a', literalValueObjectElementStart)] .
 
-%[24] OK
-xsFacet ==> [or(stringFacet,numericFacet)].
+literalValue ==> [or(allowedIdentifiers)] .
 
-%[25] OK
-stringFacet ==> [stringLength,'INTEGER'].
-stringFacet ==> ['REGEXP'].
+tripleElement ==> [or(predicate, ['<', allowedIdentifiers, '>'])] .
 
-%[26] OK
-stringLength ==> ['LENGTH'].
-stringLength ==> ['MINLENGTH'].
-stringLength ==> ['MAXLENGTH'].
+matching ==> ['MATCHING', allowedIdentifiers] .
+matching ==> [] .
 
-%[27] OK
-numericFacet ==> [numericRange,numericLiteral].
-numericFacet ==> [numericLength,'INTEGER'].
+datatype ==> ['STRING_OR_VAR', ':', 'STRING_OR_VAR'] .
+datatype ==> [] .
 
-%[28] OK
-numericRange ==> ['MININCLUSIVE'].
-numericRange ==> ['MINEXCLUSIVE'].
-numericRange ==> ['MAXINCLUSIVE'].
-numericRange ==> ['MAXEXCLUSIVE'].
+langtag ==> ['@', allowedIdentifiers] .
+langtag ==> [] .
 
-%[29] OK
-numericLength ==> ['TOTALDIGITS'].
-numericLength ==> ['FRACTIONDIGITS'].
-
-%[30] OK
-shapeDefinition ==>[*(or(extraPropertySet,'CLOSED')),'{',?(tripleExpression),'}',*(annotation),semanticActions].
-
-%[31] OK
-inlineShapeDefinition ==> [*(or(extraPropertySet,'CLOSED')),'{',?(tripleExpression),'}'].
-
-%[32] OK
-extraPropertySet ==> ['EXTRA',+(predicate)].
-
-%[33] OK
-tripleExpression ==> [oneOfTripleExpr].
-
-%[34][35][37][38][39] This nonterminals has been modyfied to make it LL(1)
-oneOfTripleExpr ==> [unaryTripleExpr, funaryTripleExpr]. 
-
-funaryTripleExpr ==>[singleElementGroup, fsingle].
-
-fsingle ==>[].
-fsingle ==>['|',unaryTripleExpr,singleElementGroup,fmulti].
-
-
-fmulti ==>['|',unaryTripleExpr,singleElementGroup,fmulti].
-fmulti ==>[].
-
-singleElementGroup ==> [].
-singleElementGroup ==> [';',elementGroup].
-
-elementGroup ==>[].
-elementGroup ==>[unaryTripleExpr,singleElementGroup].
-
-%Nonterminal [36] has been modyfied to make it LL(1)
-
-
-
-%[40] OK
-unaryTripleExpr ==> [?(tripleExprLabel),or(tripleConstraint,bracketedTripleExpr)].
-unaryTripleExpr ==> [include].
-
-
-%[41] 
-bracketedTripleExpr ==> ['(',tripleExpression,')', ?(cardinality),*(annotation),semanticActions].
-
-%[43] OK 
-tripleConstraint ==> [?(senseFlags),predicate,
-                    inlineShapeExpression,
-                    ?(cardinality),*(annotation),
-                    semanticActions].
-
-%[44] OK
-cardinality ==> ['*'].
-cardinality ==> ['+'].
-cardinality ==> ['?'].
-cardinality ==> ['REPEAT_RANGE'].
-
-%[45] OK
-senseFlags ==> ['^'].
-
-%[46] OK
-valueSet ==> ['[',*(valueSetValue),']'].
-
-%[47] OK
-valueSetValue ==> [iriRange].
-valueSetValue ==> [literal].
-
-%[48] OK
-iriRange ==> [iri,?(['~',*(exclusion)])].
-iriRange ==> ['.',+(exclusion)].
-
-%[49] OK
-exclusion ==>['-',iri,?('~')].
-
-%[50] OK
-include ==> ['&',tripleExprLabel].
-
-%[51] OK
-annotation ==>['//',predicate,or(iri,literal)].
-
-%[52] OK
-semanticActions ==> [*(codeDecl)].
-
-%[53] OK
-codeDecl ==> ['%',iri,or('CODE','%')].
-
-%[13t] OK
-literal ==> [or(rdfLiteral,numericLiteral,booleanLiteral)].
-
-%[54] OK
-predicate ==> [or(iri,'A')].
-
-%[55] OK
-datatype ==> [iri].
-
-%[56] OK
-shapeExprLabel ==> [or(iri,blankNode)].
-%shapeExprLabel ==> ['SHEX_LABEL'].
-
-%[42] OK
-tripleExprLabel ==> ['$',or(iri,blankNode)].
-
-%[16t] OK
-numericLiteral ==>['INTEGER'].
-numericLiteral ==>['DECIMAL'].
-numericLiteral ==>['DOUBLE'].
-
-%[129s] OK
-rdfLiteral ==> [string,?(or('LANGTAG',['^^',datatype]))].
-
-%[134s] OK
-booleanLiteral ==> [or('TRUE', 'FALSE')].
-
-%[135s] OK
-string ==> ['STRING_LITERAL1'].
-string ==> ['STRING_LITERAL_LONG1'].
-string ==> ['STRING_LITERAL2'].
-string ==> ['STRING_LITERAL_LONG2'].
-
-
-%[136s] OK
-iri ==> [or('IRI_REF',prefixedName)].
-
-%[137s] OK
-prefixedName ==> [ or('PNAME_LN', 'PNAME_NS') ].
-
-%[138] OK
-blankNode ==> ['BLANK_NODE_LABEL'].
-
-
+and ==> [or('AND', '&')] .
 
 % tens defined by regular expressions elsewhere
 % RDF_TYPE ten now is harcoded in the rules
 tm_regex([
-'CODE',
-'REPEAT_RANGE',
-'IRI_REF',
-'PNAME_NS',
-'PNAME_LN',
-'ATPNAME_NS',
-'ATPNAME_LN',
-'REGEXP',
-'BLANK_NODE_LABEL',
-'LANGTAG',
-'INTEGER',
-'DECIMAL',
-'DOUBLE',
-'STRING_LITERAL1',
-'STRING_LITERAL2',
-'STRING_LITERAL_LONG1',
-'STRING_LITERAL_LONG2'
+'URL',
+'DIGITS',
+'STRING_OR_VAR',
+'STRINGOPERATOR',
+'JSONPATH',
+'XMLPATH',
+'CSVPERROW'
 ]).
 
 % Terminals where name of terminal is uppercased ten content
 tm_keywords([
-
-'BASE',
 'PREFIX',
-'EXTERNAL',
-'OR',
+'SOURCE',
+'ITERATOR',
+'FIELD',
+'AUTOINCREMENT',
+'TO',
+'BY',
 'AND',
-'NOT',
-'LITERAL',
-'NONLITERAL',
-'IRI',
-'BNODE',
-'LENGTH',
-'MINLENGTH',
-'MAXLENGTH',
-'MININCLUSIVE',
-'MINEXCLUSIVE',
-'MAXINCLUSIVE',
-'MAXEXCLUSIVE',
-'TOTALDIGITS',
-'FRACTIONDIGITS',
-'CLOSED',
-'EXTRA',
-'TRUE',
-'FALSE',
-'START',
-'A'
+'AS',
+'EXPRESSION',
+'MATCHER',
+'UNION',
+'JOIN',
+'MATCHING'
 ]).
 
 % Other tens representing fixed, case sensitive, strings
@@ -321,28 +128,20 @@ tm_keywords([
 % e.g. ANON, [
 % e.g. DOUBLE, DECIMAL, INTEGER
 % e.g. INTEGER_POSITIVE, PLUS
-tm_punct([
-
-'='= '=',
-'('= '\\(',
-')'= '\\)',
+tm_punct([ 
+'<' = '<',
+'>' = '>',
+'+' = '\\+',
+'&' = '\\&',
+'a' = 'a',
+'@' = '@',
 '.'= '\\.',
-'@'= '@',
 '{'= '\\{',
 '}'= '\\}',
-'|' = '\\|',
 ';'= ';',
-'*'= '\\*',
-'+'= '\\+',
-'?' = '\\?',
-'^'= '\\^',
+','=',',
+':'=':',
 '['= '\\[',
 ']'= '\\]',
-'-'= '-',
-'~'='\\~',
-'&'='&',
-'//'='\\/\\/',
-'%'='%',
-'^^'= '\\^\\^',
 '$' = '\\$'
 ]).

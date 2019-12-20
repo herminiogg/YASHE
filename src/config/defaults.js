@@ -12,16 +12,31 @@ YASHE.defaults = $.extend(true, {}, YASHE.defaults, {
   /**
 	 *  Default shape 
 	 */
-  value: "PREFIX :       <http://example.org/>\n"+
-         "PREFIX schema: <http://schema.org/>\n"+
-         "PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>\n\n"+
-  
-         ":User IRI {\n"+ 
-         "  schema:name          xsd:string  ;\n"+
-         "  schema:birthDate     xsd:date?  ;\n"+
-         "  schema:gender        [ schema:Male schema:Female ] ;\n"+
-         "  schema:knows         @:User* \n"+
-        "}",
+  value: `PREFIX : <http://example.com/>
+SOURCE films_xml_file <https://rawgit.com/herminiogg/ShExML/master/src/test/resources/films.xml>
+SOURCE films_json_file <https://rawgit.com/herminiogg/ShExML/master/src/test/resources/films.json>
+ITERATOR film_xml <xpath: //film> {
+  FIELD id <@id>
+  FIELD name <name>
+  FIELD year <year>
+  FIELD country <country>
+  FIELD directors <directors/director>
+}
+ITERATOR film_json <jsonpath: $.films[*]> {
+  FIELD id <id>
+  FIELD name <name>
+  FIELD year <year>
+  FIELD country <country>
+  FIELD directors <director>
+}
+EXPRESSION films <films_xml_file.film_xml UNION films_json_file.film_json>
+
+:Films :[films.id] {
+  :name [films.name] ;
+  :year [films.year] ;
+  :country [films.country] ;
+  :director [films.directors] ;
+}`,
 
   highlightSelectionMatches: {
     showToken: /\w/

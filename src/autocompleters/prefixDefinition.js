@@ -2,7 +2,7 @@
 var $ = require("jquery");
 //this is a mapping from the class names (generic ones, for compatability with codemirror themes), to what they -actually- represent
 var tokenTypes = {
-  "string-2": "prefixed",
+  punc: "prefixed",
   atom: "var"
 };
 
@@ -60,7 +60,7 @@ module.exports.isValidCompletionPosition = function(yashe) {
   // we shouldnt be at the uri part the prefix declaration
   // also check whether current token isnt 'a' (that makes codemirror
   // thing a namespace is a possiblecurrent
-  if (!token.string.indexOf("a") == 0 && $.inArray("PNAME_NS", token.state.possibleCurrent) == -1) return false;
+  if (!token.string.indexOf("a") == 0 && $.inArray("STRING_OR_VAR", token.state.possibleCurrent) == -1) return false;
 
   // First token of line needs to be PREFIX,
   // there should be no trailing text (otherwise, text is wrongly inserted
@@ -105,12 +105,13 @@ module.exports.appendPrefixIfNeeded = function(yashe, completerName) {
         line: cur.line,
         ch: token.start
       }); // needs to be null (beginning of line), or whitespace
-      if (lastNonWsTokenString != "PREFIX" && (previousToken.type == "ws" || previousToken.type == null)) {
+      if (lastNonWsTokenString != "PREFIX" && (previousToken.type == "variable" || previousToken.type == null)) {
         // check whether it isnt defined already (saves us from looping
         // through the array)
-        var currentPrefix = token.string.substring(0, colonIndex + 1);
+        //var currentPrefix = token.string.substring(0, colonIndex + 1);
+        var currentPrefix = yashe.getPreviousNonWsToken(cur.line, token).string
         var queryPrefixes = yashe.getDefinedPrefixes();
-        if (queryPrefixes[currentPrefix.slice(0, -1)] == null) {
+        if (queryPrefixes[currentPrefix/**.slice(0, -1)*/] == null) {
           // ok, so it isnt added yet!
           var completions = yashe.autocompleters.getTrie(completerName).autoComplete(currentPrefix);
           if (completions.length > 0) {
