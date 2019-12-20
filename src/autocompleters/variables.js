@@ -1,17 +1,14 @@
 "use strict";
 var $ = require("jquery");
-module.exports = function(yasqe) {
+var yashe = require('../main.js')
+module.exports = function(yashe) {
   return {
     isValidCompletionPosition: function() {
-      var token = yasqe.getTokenAt(yasqe.getCursor());
-      /**if (token.type != "ws") {
-        token = yasqe.getCompleteToken(token);
-        if (token && (token.string[0] === '?' || token.string[0] === '$')) {
-          return true;
-        }
+      var token = yashe.getTokenAt(yashe.getCursor());
+      if (token.type != "ws") {
+        return true;
       }
-      return false;*/
-      return true;
+      return false;
     },
     get: function(token) {
         var variables = [];
