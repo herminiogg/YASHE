@@ -18,7 +18,7 @@ stephen.cresswell@tso.co.uk
 
 :-dynamic '==>'/2.
 
-shexML ==> [*(decl), *(shape), $].
+shexML ==> [*(decl), *(graphShape), $].
 
 decl ==> [or(source, prefix, expression, matcher, iterator, autoincrement)].
 
@@ -42,7 +42,7 @@ matchers ==> [replacedStrings, 'AS', or(allowedIdentifiers, 'STRINGOPERATOR', 'D
 
 replacedStrings ==> [or(allowedIdentifiers, 'STRINGOPERATOR', 'DIGITS'), ?([',', replacedStrings])] .
 
-allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'AS', '$')])] .
+allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'AS', ';', '$')])] .
 
 allowedIdentifiers ==> [?('AS'), ?('a'), 'STRING_OR_VAR'] .
 
@@ -57,6 +57,7 @@ composedVariable ==> [+(['.', allowedIdentifiers])] .
 
 queryClause ==> ['JSONPATH', allowedStrings] .
 queryClause ==> ['XMLPATH', allowedStrings] .
+queryClause ==> ['SQL', allowedStrings] .
 queryClause ==> ['CSVPERROW'] .
 
 union ==> [allowedIdentifiers, composedVariable, or(unions, expOperations)] .
@@ -64,7 +65,11 @@ unions ==> ['UNION', union] .
 unions ==> ['JOIN', union] .
 unions ==> [] .
 
-shape ==> [tripleElement, ?([allowedIdentifiers]), ':', '[', allowedIdentifiers, ?([composedVariable]), ']', '{', +([predicateObject, ';']), '}'] .
+graphShape ==> [tripleElement, or(graph, shape)] .
+
+graph ==> ['[','[', *([tripleElement, shape]), ']', ']'] .
+
+shape ==> [?([allowedIdentifiers]), ':', '[', allowedIdentifiers, ?([composedVariable]), ']', '{', +([predicateObject, ';']), '}'] .
 
 predicateObject ==> [predicate, or(objectElement, shapeLink, literalValueObjectElementStart), datatype, langtag] .
 
@@ -100,7 +105,8 @@ tm_regex([
 'STRINGOPERATOR',
 'JSONPATH',
 'XMLPATH',
-'CSVPERROW'
+'CSVPERROW',
+'SQL'
 ]).
 
 % Terminals where name of terminal is uppercased ten content
