@@ -20,13 +20,15 @@ stephen.cresswell@tso.co.uk
 
 shexML ==> [*(decl), *(graphShape), $].
 
-decl ==> [or(source, prefix, expression, matcher, iterator, autoincrement)].
+decl ==> [or(source, prefix, query, expression, matcher, iterator, autoincrement)].
 
 prefix ==> ['PREFIX', ?([allowedIdentifiers]), ':', '<', 'URL', '>'].
 
 source ==> ['SOURCE', allowedIdentifiers, '<', 'URL', '>'].
 
-iterator ==> ['ITERATOR', allowedIdentifiers, '<', queryClause, '>', '{', +(field), *(nestedIterator), '}'].
+query ==> ['QUERY', allowedIdentifiers, '<', or('URL', queryClause), '>'].
+
+iterator ==> ['ITERATOR', allowedIdentifiers, '<', or(queryClause, allowedIdentifiers), '>', '{', +(field), *(nestedIterator), '}'].
 
 nestedIterator ==> ['ITERATOR', allowedIdentifiers, '<', allowedStrings, '>', '{', +(field), *(nestedIterator), '}'].
 
@@ -58,6 +60,7 @@ composedVariable ==> [+(['.', allowedIdentifiers])] .
 queryClause ==> ['JSONPATH', allowedStrings] .
 queryClause ==> ['XMLPATH', allowedStrings] .
 queryClause ==> ['SQL', allowedStrings] .
+queryClause ==> ['SPARQL', allowedStrings] .
 queryClause ==> ['CSVPERROW'] .
 
 union ==> [allowedIdentifiers, composedVariable, or(unions, expOperations)] .
@@ -114,6 +117,7 @@ tm_keywords([
 'PREFIX',
 'SOURCE',
 'ITERATOR',
+'QUERY',
 'FIELD',
 'AUTOINCREMENT',
 'TO',
