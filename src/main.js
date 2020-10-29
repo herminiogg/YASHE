@@ -53,9 +53,9 @@ const root = (module.exports = function(parent, config) {
     class: 'yashe',
   }).appendTo($(parent));
   config = extendConfig(config);
-  const yasheml = extendCmInstance(codeMirror(rootEl[0], config));
-  postProcessCmElement(yasheml);
-  return yasheml;
+  const yashe = extendCmInstance(codeMirror(rootEl[0], config));
+  postProcessCmElement(yashe);
+  return yashe;
 });
 
 
