@@ -108,7 +108,7 @@ langtagContinuation ==> ['[', allowedIdentifiers, ?([composedVariable]), matchin
 
 and ==> [or('AND', '&')] .
 
-xsPrefix ==> ['xs', 'xsd'] .
+xsPrefix ==> [or('xs', 'xsd')] .
 
 % tens defined by regular expressions elsewhere
 % RDF_TYPE ten now is harcoded in the rules
