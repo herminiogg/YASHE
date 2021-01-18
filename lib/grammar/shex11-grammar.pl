@@ -46,9 +46,9 @@ matchers ==> [replacedStrings, 'AS', or(allowedIdentifiers, 'STRINGOPERATOR', 'D
 
 replacedStrings ==> [or(allowedIdentifiers, 'STRINGOPERATOR', 'DIGITS'), ?([',', replacedStrings])] .
 
-allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'd', 'AS', ';', '$')])] .
+allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'AS', ';', '$')])] .
 
-allowedIdentifiers ==> [?('AS'), ?('a'), ?('d'), 'STRING_OR_VAR'] .
+allowedIdentifiers ==> [?('AS'), ?('a'), 'STRING_OR_VAR'] .
 
 exp ==> [expOperation] .
 
@@ -108,7 +108,7 @@ langtagContinuation ==> ['[', allowedIdentifiers, ?([composedVariable]), matchin
 
 and ==> [or('AND', '&')] .
 
-xsPrefix ==> ['xs', ?(['d'])] .
+xsPrefix ==> ['xs', 'xsd'] .
 
 % tens defined by regular expressions elsewhere
 % RDF_TYPE ten now is harcoded in the rules
@@ -168,6 +168,6 @@ tm_punct([
 '['= '\\[',
 ']'= '\\]',
 '$' = '\\$',
-'xs' = 'xs',
-'d' = 'd'
+'xsd' = 'xsd',
+'xs' = 'xs'
 ]).
