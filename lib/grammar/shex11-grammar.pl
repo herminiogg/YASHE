@@ -22,7 +22,7 @@ shexML ==> [*(decl), *(graphShape), $].
 
 decl ==> [or(source, prefix, query, expression, matcher, iterator, autoincrement)].
 
-prefix ==> ['PREFIX', ?([allowedIdentifiers]), ':', '<', 'URL', '>'].
+prefix ==> ['PREFIX', ?([or(allowedIdentifiers, xsPrefix)]), ':', '<', 'URL', '>'].
 
 source ==> ['SOURCE', allowedIdentifiers, '<', 'URL', '>'].
 
@@ -32,7 +32,9 @@ iterator ==> ['ITERATOR', allowedIdentifiers, '<', or(queryClause, allowedIdenti
 
 nestedIterator ==> ['ITERATOR', allowedIdentifiers, '<', allowedStrings, '>', '{', +(field), *(nestedIterator), '}'].
 
-field ==> ['FIELD', allowedIdentifiers, '<', allowedStrings, '>'].
+field ==> [fieldKeyword, allowedIdentifiers, '<', allowedStrings, '>'].
+
+fieldKeyword ==> [or('FIELD', 'PUSHED_FIELD', 'POPPED_FIELD')].
 
 autoincrement ==> ['AUTOINCREMENT', allowedIdentifiers, '<', ?(['STRINGOPERATOR', '+']), 'DIGITS', ?(['TO', 'DIGITS']), ?(['BY', 'DIGITS']), ?(['+', 'STRINGOPERATOR']), '>'].
 
@@ -44,9 +46,9 @@ matchers ==> [replacedStrings, 'AS', or(allowedIdentifiers, 'STRINGOPERATOR', 'D
 
 replacedStrings ==> [or(allowedIdentifiers, 'STRINGOPERATOR', 'DIGITS'), ?([',', replacedStrings])] .
 
-allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'AS', ';', '$')])] .
+allowedStrings ==> [+([or('STRING_OR_VAR', '.', '[', ']', '@', 'a', 'd', 'AS', ';', '$')])] .
 
-allowedIdentifiers ==> [?('AS'), ?('a'), 'STRING_OR_VAR'] .
+allowedIdentifiers ==> [?('AS'), ?('a'), ?('d'), 'STRING_OR_VAR'] .
 
 exp ==> [expOperation] .
 
@@ -91,13 +93,22 @@ tripleElement ==> [or(predicate, ['<', allowedIdentifiers, '>'])] .
 matching ==> ['MATCHING', allowedIdentifiers] .
 matching ==> [] .
 
-datatype ==> ['STRING_OR_VAR', ':', 'STRING_OR_VAR'] .
+datatype ==> [xsPrefix, ':', datatypeDefinition] .
+datatype ==> [datatypeDefinition] .
 datatype ==> [] .
 
-langtag ==> ['@', allowedIdentifiers] .
+datatypeDefinition ==> ['[', allowedIdentifiers, ?([composedVariable]), matching, ']'] .
+datatypeDefinition ==> [allowedIdentifiers] .
+
+langtag ==> ['@', langtagContinuation] .
 langtag ==> [] .
 
+langtagContinuation ==> [allowedIdentifiers] .
+langtagContinuation ==> ['[', allowedIdentifiers, ?([composedVariable]), matching, ']'] .
+
 and ==> [or('AND', '&')] .
+
+xsPrefix ==> ['xs', ?(['d'])] .
 
 % tens defined by regular expressions elsewhere
 % RDF_TYPE ten now is harcoded in the rules
@@ -109,7 +120,8 @@ tm_regex([
 'JSONPATH',
 'XMLPATH',
 'CSVPERROW',
-'SQL'
+'SQL',
+'SPARQL'
 ]).
 
 % Terminals where name of terminal is uppercased ten content
@@ -119,6 +131,8 @@ tm_keywords([
 'ITERATOR',
 'QUERY',
 'FIELD',
+'PUSHED_FIELD',
+'POPPED_FIELD',
 'AUTOINCREMENT',
 'TO',
 'BY',
@@ -153,5 +167,7 @@ tm_punct([
 ':'=':',
 '['= '\\[',
 ']'= '\\]',
-'$' = '\\$'
+'$' = '\\$',
+'xs' = 'xs',
+'d' = 'd'
 ]).
