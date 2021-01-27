@@ -80,7 +80,7 @@ predicateObject ==> [predicate, or(objectElement, shapeLink, literalValueObjectE
 
 literalValueObjectElementStart ==> [?('STRING_OR_VAR'), ':', or(literalValue, objectElement)] .
 
-objectElement ==> [or(['[', allowedIdentifiers, ?([composedVariable]), matching, ']'], 'STRINGOPERATOR')] .
+objectElement ==> [or(['[', allowedIdentifiers, ?([composedVariable]), matching, rdfCollection, ']'], 'STRINGOPERATOR')] .
 
 shapeLink ==> [or(['@', ?(allowedIdentifiers), ':', allowedIdentifiers], ['<', ?(allowedIdentifiers), ':', allowedIdentifiers, '>'])] .
 
@@ -92,6 +92,14 @@ tripleElement ==> [or(predicate, ['<', allowedIdentifiers, '>'])] .
 
 matching ==> ['MATCHING', allowedIdentifiers] .
 matching ==> [] .
+
+rdfCollection ==> ['AS', rdfAvailableCollections] .
+rdfCollection ==> [] .
+
+rdfAvailableCollections ==> ['RDFLIST'] .
+rdfAvailableCollections ==> ['RDFSEQ'] .
+rdfAvailableCollections ==> ['RDFALT'] .
+rdfAvailableCollections ==> ['RDFBAG'] .
 
 datatype ==> [xsPrefix, ':', datatypeDefinition] .
 datatype ==> [datatypeDefinition] .
@@ -142,7 +150,11 @@ tm_keywords([
 'MATCHER',
 'UNION',
 'JOIN',
-'MATCHING'
+'MATCHING',
+'RDFLIST',
+'RDFBAG',
+'RDFALT',
+'RDFSEQ'
 ]).
 
 % Other tens representing fixed, case sensitive, strings
